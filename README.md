@@ -4,7 +4,7 @@ This repository provides the `raftpebble` package. The package exports the
 
 It is meant to be used as a backend for the `raft` [package here](https://github.com/hashicorp/raft).
 
-This implementation uses [cockroachdb pebble](github.com/cockroachdb/pebble). pebble is
+This implementation uses [cockroachdb pebble](https://github.com/cockroachdb/pebble). pebble is
 a simple persistent key-value store written in pure Go for adapter cockroachdb. It has a Log-Structured-Merge (LSM) 
 design and it's meant to be a performant alternative to non-Go based stores like 
 [RocksDB](https://github.com/facebook/rocksdb).
