@@ -71,7 +71,7 @@ func TestPebbleKVStore_Empty_FirstIndex(t *testing.T) {
 
 	// Should get 0 index on empty log
 	idx, err := store.FirstIndex()
-	assert.Equal(t, err, ErrFirstIndexKeyNotFound)
+	assert.Nil(t, err)
 	assert.Equal(t, idx, uint64(0))
 }
 
@@ -170,7 +170,7 @@ func TestPebbleKVStore_Empty_LastIndex(t *testing.T) {
 
 	// Should get 0 index on empty log
 	idx, err := store.LastIndex()
-	assert.Equal(t, err, ErrLastIndexKeyNotFound)
+	assert.Nil(t, err)
 	assert.Equal(t, idx, uint64(0))
 }
 

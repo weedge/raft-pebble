@@ -14,9 +14,8 @@ var (
 	prefixConf = []byte{0x01}
 
 	// ErrKeyNotFound is an error indicating a given key does not exist
-	ErrKeyNotFound           = errors.New("get key not found")
-	ErrFirstIndexKeyNotFound = errors.New("first index not found")
-	ErrLastIndexKeyNotFound  = errors.New("last index not found")
+	// for hashicorp raft vote meta stable get check, if err != nil && err.Error() != "not found"
+	ErrKeyNotFound = errors.New("not found")
 )
 
 const (
@@ -167,7 +166,7 @@ func (s *PebbleKVStore) Close() error {
 // log store
 
 // FirstIndex returns the first known index from the Raft log.
-// if not found return 0, not found error
+// notice: if not found return 0, nil
 func (s *PebbleKVStore) FirstIndex() (first uint64, err error) {
 	iter := s.db.NewIter(&pebble.IterOptions{
 		LowerBound: prefixLog,
@@ -180,15 +179,13 @@ func (s *PebbleKVStore) FirstIndex() (first uint64, err error) {
 
 	if iter.First() {
 		first = bytesToUint64(iter.Key()[len(prefixLog):])
-	} else {
-		err = ErrFirstIndexKeyNotFound
-		return
 	}
 
 	return
 }
 
 // LastIndex returns the last known index from the Raft log.
+// notice: if not found return 0, nil
 func (s *PebbleKVStore) LastIndex() (last uint64, err error) {
 	iter := s.db.NewIter(&pebble.IterOptions{
 		LowerBound: prefixLog,
@@ -201,9 +198,6 @@ func (s *PebbleKVStore) LastIndex() (last uint64, err error) {
 
 	if iter.Last() {
 		last = bytesToUint64(iter.Key()[len(prefixLog):])
-	} else {
-		err = ErrLastIndexKeyNotFound
-		return
 	}
 
 	return
