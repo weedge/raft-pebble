@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/hashicorp/raft"
 	raftbench "github.com/hashicorp/raft/bench"
 )
 
@@ -115,4 +116,77 @@ func BenchmarkPebbleKVStoreStore_GetUint64(b *testing.B) {
 	}()
 
 	raftbench.GetUint64(b, store)
+}
+
+func BenchmarkSet(b *testing.B) {
+	store, walDir, dir := testPebbleKVStore(b)
+	defer func() {
+		store.Close()
+		os.RemoveAll(walDir)
+		os.RemoveAll(dir)
+	}()
+	for n := 0; n < b.N; n++ {
+		store.Set(uint64ToBytes(uint64(n)), []byte("val"))
+	}
+}
+
+func BenchmarkGet(b *testing.B) {
+	store, walDir, dir := testPebbleKVStore(b)
+	defer func() {
+		store.Close()
+		os.RemoveAll(walDir)
+		os.RemoveAll(dir)
+	}()
+
+	for n := 0; n < b.N; n++ {
+		store.Set(uint64ToBytes(uint64(n)), []byte("val"))
+	}
+
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		store.Get(uint64ToBytes(uint64(n)))
+	}
+}
+
+func BenchmarkStoreLogs(b *testing.B) {
+	store, walDir, dir := testPebbleKVStore(b)
+	defer func() {
+		store.Close()
+		os.RemoveAll(walDir)
+		os.RemoveAll(dir)
+	}()
+
+	for n := 0; n < b.N; n++ {
+		store.StoreLogs([]*raft.Log{
+			{
+				Index: uint64(n),
+				Term:  uint64(n),
+			},
+		})
+	}
+}
+
+func BenchmarkGetLog(b *testing.B) {
+	store, walDir, dir := testPebbleKVStore(b)
+	defer func() {
+		store.Close()
+		os.RemoveAll(walDir)
+		os.RemoveAll(dir)
+	}()
+
+	for n := 0; n < b.N; n++ {
+		store.StoreLogs([]*raft.Log{
+			{
+				Index: uint64(n),
+				Term:  uint64(n),
+			},
+		})
+	}
+
+	b.ResetTimer()
+
+	ralog := new(raft.Log)
+	for n := 0; n < b.N; n++ {
+		store.GetLog(uint64(n), ralog)
+	}
 }
