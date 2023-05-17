@@ -10,8 +10,9 @@ design and it's meant to be a performant alternative to non-Go based stores like
 [RocksDB](https://github.com/facebook/rocksdb).
 
 # references
-1. [https://github.com/facebook/rocksdb/wiki](https://github.com/facebook/rocksdb/wiki)
-2. [https://www.cockroachlabs.com/blog/pebble-rocksdb-kv-store/](https://www.cockroachlabs.com/blog/pebble-rocksdb-kv-store/)
-3. [https://github.com/hashicorp/raft/tree/main/docs](https://github.com/hashicorp/raft/tree/main/docs)
-4. [https://raft.github.io/raft.pdf](https://raft.github.io/raft.pdf)
-5. [https://web.stanford.edu/~ouster/cgi-bin/papers/OngaroPhD.pdf](https://web.stanford.edu/~ouster/cgi-bin/papers/OngaroPhD.pdf)
+* [https://github.com/facebook/rocksdb/wiki](https://github.com/facebook/rocksdb/wiki)
+* [https://www.cockroachlabs.com/blog/pebble-rocksdb-kv-store/](https://www.cockroachlabs.com/blog/pebble-rocksdb-kv-store/)
+* [https://github.com/cockroachdb/pebble/blob/master/docs/rocksdb.md](https://github.com/cockroachdb/pebble/blob/master/docs/rocksdb.md)
+* [https://github.com/hashicorp/raft/tree/main/docs](https://github.com/hashicorp/raft/tree/main/docs)
+* [https://raft.github.io/raft.pdf](https://raft.github.io/raft.pdf)
+* [https://web.stanford.edu/~ouster/cgi-bin/papers/OngaroPhD.pdf](https://web.stanford.edu/~ouster/cgi-bin/papers/OngaroPhD.pdf)
