@@ -166,10 +166,14 @@ func (s *PebbleKVStore) Close() error {
 // log store
 
 // FirstIndex returns the first known index from the Raft log.
+// use SeekPrefixGE,Reverse iteration (Prev) is not supported when an iterator is in prefix iteration mode.
+// https://pkg.go.dev/github.com/cockroachdb/pebble#Iterator.SeekPrefixGE
+// so use lowerBound,UpperBound for iter prefixLog
 // notice: if not found return 0, nil
 func (s *PebbleKVStore) FirstIndex() (first uint64, err error) {
 	iter := s.db.NewIter(&pebble.IterOptions{
 		LowerBound: prefixLog,
+		UpperBound: prefixConf,
 		KeyTypes:   pebble.IterKeyTypePointsAndRanges,
 	})
 
@@ -185,10 +189,14 @@ func (s *PebbleKVStore) FirstIndex() (first uint64, err error) {
 }
 
 // LastIndex returns the last known index from the Raft log.
+// use SeekPrefixGE,Reverse iteration (Prev) is not supported when an iterator is in prefix iteration mode.
+// https://pkg.go.dev/github.com/cockroachdb/pebble#Iterator.SeekPrefixGE
+// so use lowerBound,UpperBound for iter prefixLog
 // notice: if not found return 0, nil
 func (s *PebbleKVStore) LastIndex() (last uint64, err error) {
 	iter := s.db.NewIter(&pebble.IterOptions{
 		LowerBound: prefixLog,
+		UpperBound: prefixConf,
 		KeyTypes:   pebble.IterKeyTypePointsAndRanges,
 	})
 

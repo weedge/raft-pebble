@@ -61,6 +61,30 @@ func TestPebbleKVStore_Implements(t *testing.T) {
 	}
 }
 
+func TestPebbleKVStore_Empty(t *testing.T) {
+	store, walDir, dir := testPebbleKVStore(t)
+	defer func() {
+		store.Close()
+		os.RemoveAll(walDir)
+		os.RemoveAll(dir)
+	}()
+
+	// Should get 0 index on empty log
+	idx, err := store.FirstIndex()
+	assert.Nil(t, err)
+	assert.Equal(t, idx, uint64(0))
+
+	// Should get 0 index on empty log
+	idx, err = store.LastIndex()
+	assert.Nil(t, err)
+	assert.Equal(t, idx, uint64(0))
+
+	// Should get 0 index on empty log
+	idx, err = store.FirstIndex()
+	assert.Nil(t, err)
+	assert.Equal(t, idx, uint64(0))
+}
+
 func TestPebbleKVStore_Empty_FirstIndex(t *testing.T) {
 	store, walDir, dir := testPebbleKVStore(t)
 	defer func() {
@@ -71,6 +95,26 @@ func TestPebbleKVStore_Empty_FirstIndex(t *testing.T) {
 
 	// Should get 0 index on empty log
 	idx, err := store.FirstIndex()
+	assert.Nil(t, err)
+	assert.Equal(t, idx, uint64(0))
+
+	// Set prefixConf meta
+	// Attempt to set the k/v pair
+	k, v := prefixLog, uint64(123)
+	if err := store.SetUint64(k, v); err != nil {
+		t.Fatalf("err: %s", err)
+	}
+	// Read back the value
+	val, err := store.GetUint64(k)
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+	if val != v {
+		t.Fatalf("bad: %v", val)
+	}
+
+	// Should get 0 index on empty log
+	idx, err = store.FirstIndex()
 	assert.Nil(t, err)
 	assert.Equal(t, idx, uint64(0))
 }
@@ -170,6 +214,26 @@ func TestPebbleKVStore_Empty_LastIndex(t *testing.T) {
 
 	// Should get 0 index on empty log
 	idx, err := store.LastIndex()
+	assert.Nil(t, err)
+	assert.Equal(t, idx, uint64(0))
+
+	// Set prefixConf meta
+	// Attempt to set the k/v pair
+	k, v := prefixLog, uint64(123)
+	if err := store.SetUint64(k, v); err != nil {
+		t.Fatalf("err: %s", err)
+	}
+	// Read back the value
+	val, err := store.GetUint64(k)
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+	if val != v {
+		t.Fatalf("bad: %v", val)
+	}
+
+	// Should get 0 index on empty log
+	idx, err = store.LastIndex()
 	assert.Nil(t, err)
 	assert.Equal(t, idx, uint64(0))
 }
