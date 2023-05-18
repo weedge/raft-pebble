@@ -12,7 +12,7 @@ design and it's meant to be a performant alternative to non-Go based stores like
 # bench Pebble vs Badger
 bench with [BBVA/raft-badger](https://github.com/weedge/raft-badger),
 run `go test -run=NONE -benchmem -bench=. ./...` to diff bench result,
-below bench on macOS, more bench please test on product env machine (SSD)
+below just simple bench on macOS, more bench please test on product env machine (use SATA/NVMe SSD, think Compression and sync w, use diff k/v dataset, w/r mode)
 ```
 goos: darwin
 goarch: amd64
