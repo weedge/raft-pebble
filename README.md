@@ -63,3 +63,5 @@ more prioritization feature vs rocksdb diff see [pebble-rocksdb-kv-store](https:
 * [https://github.com/hashicorp/raft/tree/main/docs](https://github.com/hashicorp/raft/tree/main/docs)
 * [https://raft.github.io/raft.pdf](https://raft.github.io/raft.pdf)
 * [https://web.stanford.edu/~ouster/cgi-bin/papers/OngaroPhD.pdf](https://web.stanford.edu/~ouster/cgi-bin/papers/OngaroPhD.pdf)
+* [badger-txn](https://dgraph.io/blog/post/badger-txn/)
+* [https://www.cockroachlabs.com/blog/consistency-model/](https://www.cockroachlabs.com/blog/consistency-model/)
