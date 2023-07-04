@@ -313,16 +313,19 @@ func (s *PebbleKVStore) Set(key []byte, val []byte) (err error) {
 func (s *PebbleKVStore) Get(key []byte) (value []byte, err error) {
 	confKey := append(prefixConf, key...)
 	value, closer, err := s.db.Get(confKey)
-	if value == nil {
-		err = ErrKeyNotFound
-		return
-	}
-
 	defer func() {
 		if closer != nil {
 			err = FirstError(err, closer.Close())
 		}
 	}()
+	// close err when get fail
+	if err != nil && err != pebble.ErrNotFound {
+		return
+	}
+	if value == nil {
+		err = ErrKeyNotFound
+		return
+	}
 
 	return
 }
