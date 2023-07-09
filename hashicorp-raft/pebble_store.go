@@ -216,15 +216,18 @@ func (s *PebbleKVStore) LastIndex() (last uint64, err error) {
 func (s *PebbleKVStore) GetLog(index uint64, log *raft.Log) (err error) {
 	key := append(prefixLog, uint64ToBytes(index)...)
 	val, closer, err := s.db.Get(key)
-	if val == nil {
-		return raft.ErrLogNotFound
-	}
-
 	defer func() {
 		if closer != nil {
 			err = FirstError(err, closer.Close())
 		}
 	}()
+	// close err when get fail
+	if err != nil && err != pebble.ErrNotFound {
+		return
+	}
+	if val == nil {
+		return raft.ErrLogNotFound
+	}
 
 	return decodeMsgPack(val, log)
 }
