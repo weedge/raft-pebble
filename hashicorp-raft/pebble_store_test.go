@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"strconv"
 	"testing"
 
 	"github.com/cockroachdb/pebble"
@@ -104,13 +105,16 @@ func TestPebbleKVStore_Empty_FirstIndex(t *testing.T) {
 	if err := store.SetUint64(k, v); err != nil {
 		t.Fatalf("err: %s", err)
 	}
-	// Read back the value
-	val, err := store.GetUint64(k)
-	if err != nil {
-		t.Fatalf("err: %s", err)
-	}
-	if val != v {
-		t.Fatalf("bad: %v", val)
+
+	for i := 0; i < 3; i++ {
+		// Read back the value
+		val, err := store.GetUint64(k)
+		if err != nil {
+			t.Fatalf("err: %s", err)
+		}
+		if val != v {
+			t.Fatalf("bad: %v", val)
+		}
 	}
 
 	// Should get 0 index on empty log
@@ -425,20 +429,28 @@ func TestPebbleKVStore_Set_Get(t *testing.T) {
 		t.Fatalf("expected not found error, got: %q", err)
 	}
 
-	k, v := []byte("hello"), []byte("world")
+	for j := 0; j < 3; j++ {
+		k, v := []byte("hello"+strconv.Itoa(j)), []byte("world")
 
-	// Try to set a k/v pair
-	if err := store.Set(k, v); err != nil {
-		t.Fatalf("err: %s", err)
-	}
+		// Try to set a k/v pair
+		if err := store.Set(k, v); err != nil {
+			t.Fatalf("err: %s", err)
+		}
 
-	// Try to read it back
-	val, err := store.Get(k)
-	if err != nil {
-		t.Fatalf("err: %s", err)
-	}
-	if !bytes.Equal(val, v) {
-		t.Fatalf("bad: %v", val)
+		for i := 0; i < 2; i++ {
+			// Try to read it back
+			val, err := store.Get(k)
+			if err != nil {
+				t.Fatalf("err: %s", err)
+			}
+			if !bytes.Equal(val, v) {
+				t.Fatalf("i:%d key: %s get: %s want: %s", i, k, val, v)
+			}
+			// test pebble.DB get from LazyValue.Value, modify
+			if len(val) > 0 {
+				val[0] = 0x1
+			}
+		}
 	}
 }
 
