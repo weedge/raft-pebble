@@ -315,23 +315,22 @@ func (s *PebbleKVStore) Set(key []byte, val []byte) (err error) {
 // notice: if key/val not found return ErrKeyNotFound
 func (s *PebbleKVStore) Get(key []byte) (value []byte, err error) {
 	confKey := append(prefixConf, key...)
-	val, closer, err := s.db.Get(confKey)
-	defer func() {
-		if closer != nil {
-			err = FirstError(err, closer.Close())
+	err = s.GetValue(confKey, func(val []byte) error {
+		if val == nil {
+			err = ErrKeyNotFound
+			return err
 		}
-	}()
-	// close err when get fail
-	if err != nil && err != pebble.ErrNotFound {
-		return
-	}
-	if val == nil {
-		err = ErrKeyNotFound
-		return
-	}
 
-	value = make([]byte, len(val))
-	copy(value, val)
+		value = val
+		// https://github.com/hashicorp/raft/blob/v1.5.0/raft.go#L1623 no modify
+		// if have modify op, use copy, but add some GC
+		/*
+			value = make([]byte, len(val))
+			copy(value, val)
+		*/
+
+		return nil
+	})
 
 	return
 }
@@ -342,10 +341,32 @@ func (s *PebbleKVStore) SetUint64(key []byte, val uint64) error {
 }
 
 // GetUint64 is like Get, but return uint64 values
-func (s *PebbleKVStore) GetUint64(key []byte) (uint64, error) {
-	val, err := s.Get(key)
-	if err != nil {
-		return 0, err
+func (s *PebbleKVStore) GetUint64(key []byte) (term uint64, err error) {
+	confKey := append(prefixConf, key...)
+	err = s.GetValue(confKey, func(val []byte) error {
+		if val == nil {
+			err = ErrKeyNotFound
+			return err
+		}
+
+		term = bytesToUint64(val)
+
+		return nil
+	})
+
+	return
+}
+
+// GetValue defer closer.Close to do op safely when modify get value
+func (s *PebbleKVStore) GetValue(key []byte, op func([]byte) error) (err error) {
+	val, closer, err := s.db.Get(key)
+	if err != nil && err != pebble.ErrNotFound {
+		return
 	}
-	return bytesToUint64(val), nil
+	defer func() {
+		if closer != nil {
+			err = FirstError(err, closer.Close())
+		}
+	}()
+	return op(val)
 }

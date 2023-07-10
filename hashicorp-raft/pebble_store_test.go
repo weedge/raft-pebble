@@ -447,9 +447,13 @@ func TestPebbleKVStore_Set_Get(t *testing.T) {
 				t.Fatalf("i:%d key: %s get: %s want: %s", i, k, val, v)
 			}
 			// test pebble.DB get from LazyValue.Value, modify
-			if len(val) > 0 {
-				val[0] = 0x1
-			}
+			// https://github.com/hashicorp/raft/blob/v1.5.0/raft.go#L1623 no modify
+			// if have modify op, Get use copy, open to test
+			/*
+				if len(val) > 0 {
+					val[0] = 0x1
+				}
+			*/
 		}
 	}
 }
