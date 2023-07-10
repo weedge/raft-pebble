@@ -5,24 +5,23 @@ name: Go
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.19
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
 
-    - name: Build
-      run: go build -v ./...
+      - name: Hashicorp Raft Build
+        run: cd ./hashicorp-raft && go build -v ./...
 
-    - name: Test
-      run: go test -v ./...
+      - name: Hashicorp Raft Test
+        run: cd ./hashicorp-raft && go test -v ./...
